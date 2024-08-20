@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@400;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    <title>Терасса</title>
+</head>
+<style>.add-to-cart-btn {
+    background-color: #7FB5B5;
+    color: white;
+    border: none;
+    padding: 6px 10px; /* Уменьшаем размер кнопки */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em; /* Уменьшаем размер шрифта */
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+    margin-left: 180px; /* Подвигаем кнопку правее */
+}
+
+.add-to-cart-btn:hover {
+    background-color: #5C8D8D;
+}
+
+
+/* Стили для кнопки корзины */
+.cart-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.8); /* Цвет фона с прозрачностью */
+    color: white;
+    border: 2px solid white; /* Белая окантовка */
+    padding: 12px 20px; /* Увеличение внутренних отступов */
+    border-radius: 8px; /* Скругление углов */
+    cursor: pointer;
+    font-size: 1.1em; /* Увеличение размера шрифта */
+    transition: all 0.3s ease; /* Плавное изменение всех свойств */
+}
+
+.cart-btn:hover {
+    transform: scale(1.1); /* Увеличение размера при наведении */
+    background-color: rgba(0, 0, 0, 0.9); /* Изменение цвета фона при наведении */
+}
+
+
+/* Стили для модального окна */
+.modal {
+    display: none; /* По умолчанию скрыто */
+    position: fixed;
+    z-index: 999; /* Находится выше всех остальных элементов */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный черный фон */
+    overflow: auto; /* Добавляем прокрутку, если содержимое больше размеров окна */
+}
+
+/* Стили для содержимого модального окна */
+.modal-content {
+    background-color: #fefefe; /* Белый фон */
+    margin: 15% auto; /* Выравнивание по центру */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ширина контента */
+    border-radius: 10px; /* Скругление углов */
+}
+
+/* Стили для кнопки закрытия модального окна */
+.close {
+    color: #aaa; /* Цвет крестика */
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black; /* Изменяем цвет при наведении */
+    text-decoration: none; /* Убираем подчеркивание при наведении */
+    cursor: pointer; /* Указатель мыши */
+}
+
+/* Стили для заголовка */
+.modal-content h2 {
+    margin-top: 0; /* Убираем отступ сверху */
+}
+
+/* Стили для кнопки "Очистить корзину" */
+#clearCartBtn {
+    background-color:rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+#clearCartBtn:hover {
+    background-color: #cc0000; /* Темно-красный при наведении */
+}
+/* Стили для содержимого модального окна "Товар добавлен в корзину" */
+#successModal .modal-content {
+    background-color: rgba(127, 181, 181, 0.9); /* Полупрозрачный цвет фона */
+    color: white; /* Цвет текста */
+    padding: 30px; /* Увеличение внутренних отступов */
+    text-align: center; /* Выравнивание текста по центру */
+    border-radius: 5px; /* Увеличение скругления углов */
+    width: 70%; /* Увеличение ширины */
+    margin: auto; /* Выравнивание по центру по горизонтали */
+    font-size: 1.1em; /* Увеличение размера шрифта */
+}
+
+#successModal .close {
+    display: none; /* Убираем крестик */
+    color: white; /* Цвет крестика */
+    font-size: 60px; /* Увеличенный размер шрифта */
+    position: absolute; /* Абсолютное позиционирование */
+    top: 15px; /* Отступ сверху */
+    right: 15px; /* Отступ справа */
+    cursor: pointer; /* Изменение курсора при наведении */
+}
+
+#successModal p {
+    font-size: 1.5em; /* Увеличение размера текста */
+    
+    color: #ffffff; /* Цвет текста */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Добавление тени */
+}
+
+/* Стили для карточки товара в корзине */
+#cartItems li {
+    list-style: none; /* Убираем маркеры списка */
+    margin-bottom: 20px; /* Увеличенный отступ между карточками товаров */
+    border-bottom: 1px solid #ccc; /* Подчеркивание между карточками */
+    padding-bottom: 20px; /* Увеличенный внутренний отступ снизу */
+    display: flex; /* Отображение элементов в строку */
+    align-items: center; /* Центрируем элементы по вертикали */
+}
+
+#cartItems img {
+    width: 150px; /* Уменьшаем размер изображения */
+    height: auto; /* Высота автоматически подстраивается */
+    margin-right: 20px; /* Увеличенный отступ справа */
+    border-radius: 5px; /* Скругление углов для изображения */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень для изображения */
+}
+
+#cartItems span {
+    flex: 1; /* Занимает оставшееся пространство в строке */
+    font-size: 1.3em; /* Увеличение размера шрифта */
+    color: #333; /* Цвет текста */
+    padding: 15px; /* Внутренний отступ текста */
+    border-radius: 5px; /* Скругление углов для прямоугольника */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень для прямоугольника */
+    background-color: #fff; /* Белый цвет фона */
+}
+
+.remove-from-cart-btn {
+    background-color:rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px; /* Отступы кнопки */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em; /* Размер шрифта кнопки */
+    transition: background-color 0.3s ease; /* Плавное изменение цвета фона */
+}
+
+.remove-from-cart-btn:hover {
+    background-color: #cc0000; /* Темно-красный при наведении */
+}
+.checkout-btn {
+    background-color:rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px; /* Отступы кнопки */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em; /* Размер шрифта кнопки */
+    transition: background-color 0.3s ease; /* Плавное изменение цвета фона */
+    margin-top: 20px; /* Отступ сверху */
+}
+
+.checkout-btn:hover {
+    background-color: #45a049; /* Темно-зеленый при наведении */
+}
+.contact-form {
+    margin-top: 20px;
+}
+
+.contact-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.contact-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.contact-form button:hover {
+    background-color: #0056b3;
+}
+
+  </style>
+<body>
+    <header>
+        <div class="logo">
+            <img src="/images/logo.svg" alt="Your Logo">
+        </div>
+        <div class="header-overlay"></div>  
+        
+        <nav>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li class="dropdown">
+                        <div class="navigation"></div>
+                        <a href="#menu">Меню</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#appetizers">Закуски</a></li>
+                            <li><a href="#main-courses">Основные блюда</a></li>
+                            <li><a href="#desserts">Десерты</a></li>
+                        </ul>
+                    </li>
+                    <li class="active"><a href="about.html">О нас</a></li>
+                    <li><a href="#contact">Контакты</a></li>
+                    <li><a href="booking.html">Бронирование</a></li>
+                </ul>
+            </nav>
+    </header>
+
+    <section id="menu" class="menu-container">
+        
+    
+        <!-- Секция с закусками -->
+        <section class="menu-section" id="appetizers">
+            <h3>Закуски</h3>
+            <div class="menu-item">
+                <figure>
+                    <img src="/images/appetizers2.png" alt="Закуска 1">
+                    <figcaption>
+                        <h3>Чикен Мини Баскет</h3>
+                      
+                        <p>Состав: крылышки в медово-чесночном соусе, крылышки в соусе тайский чили,картофеь фри</p>
+                        <p> Цена: 414₽</p>
+                        <button class="add-to-cart-btn" data-price="414">В корзину</button>
+
+                    </figcaption>
+                </figure>
+        </div>
+        <div class="menu-item">
+            <figure>
+                <img src="/images/appetizers2.png" alt="Закуска 1">
+                <figcaption>
+                    <h3>Чикен Терра Микс</h3>
+                    <p>Состав: крылышки в медово-чесночном соусе,крылышки в соусе тайский чили, стрипса в сырной панировке, луковые кольца,сырные палочки</p>
+                    <p> Цена: 1515₽</p>
+                    <button class="add-to-cart-btn" data-price="1555">В корзину</button>
+
+                </figcaption>
+            </figure>
+    </div>
+    <div class="menu-item">
+        <figure>
+            <img src="/images/чикенМаксиСет.webp" alt="Закуска 1">
+            <figcaption>
+                <h3>Чикен Макси Сет</h3>
+                <p>Состав: крылышки в медово-чесночном соусе, крылышка в
+                    соусе тайский чили, 2 порции
+                    картошки фри</p>
+                <p> Цена: 788₽</p>
+                <button class="add-to-cart-btn" data-price="788">В корзину</button>
+
+            </figcaption>
+        </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/тайскийЧили.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>8 Крылышек в соусе </h3>
+               <h3>тайский чили</h3> 
+          
+            <p>Состав: 8 крылышек в соусе тайский чили</p>
+            <p> Цена: 384₽</p>
+            <button class="add-to-cart-btn" data-price="384">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+ <div class="menu-item">
+                <figure>
+                    <img src="/images/фриЖаренныйЛук.webp" alt="Закуска 1">
+                    <figcaption>
+                        <h3>Фри жаренный лук</h3>
+                      
+                        <p>Состав: Картофель фри, жареный лук, фирменный соус</p>
+                        <p> Цена: 252₽</p>
+                        <button class="add-to-cart-btn" data-price="250">В корзину</button>
+
+                    </figcaption>
+                </figure>
+        </div>
+     
+            <div class="menu-item">
+                <figure>
+                    <img src="/images/4сыра.webp" alt="Закуска 1">
+                    <figcaption>
+                        <h3>Фри 4 сыра</h3>
+                      
+                        <p>Состав:  Картофель фри , лук жаренный, пармезан, чеддер ,сулугуни, моцарелла, соус сырный</p>
+                        <p> Цена: 315₽</p>
+                        <button class="add-to-cart-btn" data-price="315">В корзину</button>
+
+                    </figcaption>
+                </figure>
+        </div>
+        <div class="menu-item">
+            <figure>
+                <img src="/images/курочкаФри.webp" alt="Закуска 1">
+                <figcaption>
+                    <h3>курочка Фри</h3>
+                  
+                    <p>Состав: Картофель фри, стрипсы куриные, кетчуп</p>
+                    <p> Цена: 333₽</p>
+                    <button class="add-to-cart-btn" data-price="333">В корзину</button>
+
+                </figcaption>
+            </figure>
+    </div>
+    <div class="menu-item">
+        <figure>
+            <img src="/images/фрибарбекю.webp" alt="Закуска 1">
+            <figcaption>
+                <h3>Фри бекон барбекю</h3>
+              
+                <p>Состав: Картофель фри, бекон, соус барбекю</p>
+                <p> Цена: 250₽</p>
+                <button class="add-to-cart-btn" data-price="315">В корзину</button>
+
+            </figcaption>
+        </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/Баскет.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Баскет</h3>
+          
+            <p>Состав: Фри, наггетсы</p>
+            <p> Цена: 495₽</p>
+            <button class="add-to-cart-btn" data-price="495">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/МиксБаскет.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Микс Баскет</h3>
+          
+            <p>Состав:  Фри, наггетсы, луковые кольца</p>
+            <p> Цена: 464₽</p>
+            <button class="add-to-cart-btn" data-price="464">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/СуперМиксБаскет.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Супер Микс Баскет</h3>
+          
+            <p>Состав: Фри, наггетсы, сырные палочки, луковые кольца</p>
+            <p> Цена: 525₽</p>
+            <button class="add-to-cart-btn" data-price="525">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/БаскетЧикенЧиз.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Баскет чикен чиз</h3>
+          
+            <p>Состав: Фри, наггетсы, сырные палочки</p>
+            <p> Цена: 525₽</p>
+            <button class="add-to-cart-btn" data-price="525">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+
+    </section>
+        <!-- Секция с основными блюдами -->
+        <section class="menu-section" id="main-courses">
+            <h3>Основные блюда</h3>
+            <div class="menu-item">
+                <figure>
+                    <img src="/images/пастаСливочныйЛосось.webp" alt="Закуска 1">
+                    <figcaption>
+                        <h3>Паста Сливочный Лосось</h3>
+                      
+                        <p>Состав: спагетти с чернилами каракатицы, сливки, лосось, морской коктейль, шпинат, черри</p>
+                        <p> Цена: 595₽</p>
+                        <button class="add-to-cart-btn" data-price="595">В корзину</button>
+
+                    </figcaption>
+                </figure>
+        </div>
+        <div class="menu-item">
+            <figure>
+                <img src="/images/пастаПесто.webp" alt="Закуска 1">
+                <figcaption>
+                    <h3>Паста с креветками </h3>
+                        <h3> и соусом песто</h3>
+                        
+                  
+                    <p>Состав: альятелле со шпинатом, креветки, сливки, соус песто, черри</p>
+                    <p> Цена: 555₽</p>
+                    <button class="add-to-cart-btn" data-price="555">В корзину</button>
+
+                </figcaption>
+            </figure>
+    </div>
+    <div class="menu-item">
+        <figure>
+            <img src="/images/пастаОстраяГовядина.webp" alt="Закуска 1">
+            <figcaption>
+                <h3>Паста Острая Говядина</h3>
+              
+                <p>Состав: спагетти с чесноком и красным перцем, говядина, бекон, брокколи, соус терияки, болгарский перец, черри</p>
+                <p> Цена: 525₽</p>
+                <button class="add-to-cart-btn" data-price="525">В корзину</button>
+
+            </figcaption>
+        </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/пастаБолоньезе.jpg" alt="Закуска 1">
+        <figcaption>
+            <h3>Болоньезе</h3>
+          
+            <p>Состав: лапша яичная, свинина, говядина, сыр пармезан</p>
+            <p> Цена: 353₽</p>
+            <button class="add-to-cart-btn" data-price="353">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+ <div class="menu-item">
+                <figure>
+                    <img src="/images/БлюЧиЗСуп.webp" alt="Закуска 1">
+                    <figcaption>
+                        <h3>Крем суп Блю Чиз</h3>
+                      
+                        <p>Состав:  Сыр горгонзола, брокколи, сливочное масло, лук репчатый, сливки, молоко, чеснок, бульон овощной, сухарики.</p>
+                        <p> Цена: 454₽</p>
+                        <button class="add-to-cart-btn" data-price="454">В корзину</button>
+
+                    </figcaption>
+                </figure>
+        </div>
+     
+            <div class="menu-item">
+                <figure>
+                    <img src="/images/кремСупБрокколи.webp" alt="Закуска 1">
+                    <figcaption>
+                        <h3>Крем суп Брокколи</h3>
+                      
+                        <p>Состав:Капуста брокколи, картофель, чеснок, лук репчатый, масло оливковое, сливки, бульон овощной, сухарики.</p>
+                        <p> Цена: 282₽</p>
+                        <button class="add-to-cart-btn" data-price="282">В корзину</button>
+
+                    </figcaption>
+                </figure>
+        </div>
+        <div class="menu-item">
+            <figure>
+                <img src="/images/кремСупКреветка.webp" alt="Закуска 1">
+                <figcaption>
+                    <h3>Крем Суп Креветка</h3>
+                  
+                    <p>Состав: Креветка коктейльная, картофель, икра тобико, морковь, бульон овощной, лук репчатый, соус томатный, молоко, сливки, сухарики.</p>
+                    <p> Цена: 292₽</p>
+                    <button class="add-to-cart-btn" data-price="292">В корзину</button>
+
+                </figcaption>
+            </figure>
+    </div>
+    <div class="menu-item">
+        <figure>
+            <img src="/images/супГрибной.webp" alt="Закуска 1">
+            <figcaption>
+                <h3>Крем Суп Грибной</h3>
+              
+                <p>Состав: Шампиньоны, грибы белые, лук репчатый, картофель, молоко, сливки, масло подсолнечное, бульон овощной, сухарики.</p>
+                <p> Цена: 292₽</p>
+                <button class="add-to-cart-btn" data-price="292">В корзину</button>
+
+            </figcaption>
+        </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/цезарьСемга.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Цезарь с Семгой</h3>
+          
+            <p>Состав: Сёмга слабосолёная, капуста пекинская, помидор, сыр пармезан, сухарики чесночные, соус дзадзыки</p>
+            <p> Цена: 424₽</p>
+            <button class="add-to-cart-btn" data-price="424">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/цезарьКреветка.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Цезарь с креветкой </h3>
+          
+            <p>Состав: Креветка тигровая, капуста пекинская, помидор, сыр пармезан, сухарики чесночные, соус дзадзыки</p>
+            <p> Цена: 424₽</p>
+            <button class="add-to-cart-btn" data-price="424">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/греческий.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Греческий</h3>
+          
+            <p>Состав:  Свежий помидор, свежий огурец, перец болгарский, капуста пекинская, маслины, сыр фета, оливковое масло, соус бальзамический</p>
+            <p> Цена: 233₽</p>
+            <button class="add-to-cart-btn" data-price="233">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/цезарьКурица.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Цезарь с курицец</h3>
+          
+            <p>Состав: Филе куриное, капуста пекинская, помидор, сыр пармезан, сухарики чесночные, соус дзадзыки</p>
+            <p> Цена: 222₽</p>
+            <button class="add-to-cart-btn" data-price="222">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+    </section>
+    
+    
+        <!-- Секция с десертами -->
+        <section class="menu-section" id="desserts">
+            <h3>Десерты</h3>
+            <div class="menu-item">
+                <figure>
+                    <img src="/images/пирогЛимонный.webp" alt="Закуска 1">
+                    <figcaption>
+                        <h3>Пирог лимонный</h3>
+                      
+                        <p>Состав: Лимонный бисквит</p>
+                        <p> Цена: 99₽</p>
+                        <button class="add-to-cart-btn" data-price="99">В корзину</button>
+
+                    </figcaption>
+                </figure>
+        </div>
+        <div class="menu-item">
+            <figure>
+                <img src="/images/МаковыйБисквит.webp" alt="Закуска 1">
+                <figcaption>
+                    <h3>Маковый Бисквит</h3>
+                  
+                    <p>Состав:Маковый бисквит со сливочным сыром,фруктами и орехами</p>
+                    <p> Цена: 277₽</p>
+                    <button class="add-to-cart-btn" data-price="277">В корзину</button>
+
+                </figcaption>
+            </figure>
+    </div>
+    <div class="menu-item">
+        <figure>
+            <img src="/images/Тирамису.webp" alt="Закуска 1">
+            <figcaption>
+                <h3>Тирамису</h3>
+              
+                <p>Состав:Бисквитное печенье, сливки, эспрессо, тёмный шоколад</p>
+                <p> Цена: 277₽</p>
+                <button class="add-to-cart-btn" data-price="277">В корзину</button>
+
+            </figcaption>
+        </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/наполеон.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Наполеон</h3>
+          
+            <p>Состав:  Слоеное тесто, заварной крем, сахарная пудра</p>
+            <p> Цена: 222₽</p>
+            <button class="add-to-cart-btn" data-price="222">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+ <div class="menu-item">
+                <figure>
+                    <img src="/images/зефирноКлубничныйМусс.webp" alt="Закуска 1">
+                    <figcaption>
+                        <h3>зефирно Клубничный</h3>
+                        <h3>Мусс</h3>
+                        <p>Состав: Клубника, зефир, сливки</p>
+                        <p> Цена: 155</p>
+                        <button class="add-to-cart-btn" data-price="155">В корзину</button>
+
+                    </figcaption>
+                </figure>
+        </div>
+     
+            <div class="menu-item">
+                <figure>
+                    <img src="/images/ПаннаКота.webp" alt="Закуска 1">
+                    <figcaption>
+                        <h3 class="desert">Панна Котта</h3>
+                         <h3>с чиа и апельсином</h3>
+                        <p>Состав:Сливочное желе с семенами чиа и белым шоколадом, апельсиновое желе, кусочки апельсина</p>
+                        <p> Цена: 223₽</p>
+                        <button class="add-to-cart-btn" data-price="223">В корзину</button>
+
+                    </figcaption>
+                </figure>
+        </div>
+        <div class="menu-item">
+            <figure>
+                <img src="/images/Йогуртин.webp" alt="Закуска 1">
+                <figcaption>
+                    <h3>Йогуртин</h3>
+                  
+                    <p>Состав: Йогурт натуральный, мюсли, банан, манго, ананас, кешью, семена чиа</p>
+                    <p> Цена: 404₽</p>
+                    <button class="add-to-cart-btn" data-price="404">В корзину</button>
+
+                </figcaption>
+            </figure>
+    </div>
+    <div class="menu-item">
+        <figure>
+            <img src="/images/Шоколадныйбисквит.webp" alt="Закуска 1">
+            <figcaption>
+                <h3>Шоколадный бисквит</h3>
+              
+                <p>Состав:  Шоколадный бисквит с вареной сгущенкой и орехами</p>
+                <p> Цена: 297₽</p>
+                <button class="add-to-cart-btn" data-price="297">В корзину</button>
+
+            </figcaption>
+        </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/СмузиСмородина.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Смузи Смородина</h3>
+          
+            <p>Состав: Банан, черная смородина, йогурт натуральный, мед, кокосовая стружка,миндадль </p>
+            <p> Цена: 246₽</p>
+            <button class="add-to-cart-btn" data-price="246">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/СмузиКиви.jpg" alt="Закуска 1">
+        <figcaption>
+            <h3>Смузи Киви</h3>
+          
+            <p>Состав:  Киви,банан, сливки, кокосовая стружка, овсяные хлопья, мед, семена чиа, орех кедровый,семена льна</p>
+            <p> Цена: 299₽</p>
+            <button class="add-to-cart-btn" data-price="299">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/смузиКлубника.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Смузи Клубника</h3>
+          
+            <p>Состав: Клубника,творог, йогурт, кокосовая стружка,мед, мак,орех минадль,мята</p>
+            <p> Цена: 311₽</p>
+            <button class="add-to-cart-btn" data-price="311">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+<div class="menu-item">
+    <figure>
+        <img src="/images/смузиМанго.webp" alt="Закуска 1">
+        <figcaption>
+            <h3>Смузи Манго</h3>
+          
+            <p>Состав: манго,арахисовая паста,банан,сливки,кокосовая стружка,мак,кешью, семена льна,семечки тыквы</p>
+            <p> Цена: 477₽</p>
+            <button class="add-to-cart-btn" data-price="477">В корзину</button>
+
+        </figcaption>
+    </figure>
+</div>
+</section>
+</section>
+<section id="contact" class="contact-section">
+    <div class="container">
+        <div class="contact-container">
+            <h2 class="contact-heading">Контакты</h2>
+            <div class="contact-info">
+                <p class="contact-item">Петровская ул., 104 (ПКиО им. Горького)</p>
+                <p class="contact-item">Телефон: +7 (989) 500-10-02</p>
+                <p class="contact-item">Email: terassa@example.com</p>
+            </div>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d21679.33958157724!2d38.903693339248974!3d47.21819755400671!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40e3fd4f3c7fb501%3A0x71ac7d01125f8308!2z0KLQtdGA0YDQsNGB0LA!5e0!3m2!1sru!2sru!4v1714574597917!5m2!1sru!2sru" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        
+            <h3>Обратная связь</h3>
+            <form id="contactForm" class="contact-form">
+                <label for="name">Имя:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="phone">Телефон:</label>
+                <input type="tel" id="phone" name="phone" required>
+
+                <label for="message">Сообщение:</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+    
+    <div id="cart" class="cart-btn">Корзина</div>
+    
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Корзина</h2>
+            <ul id="cartItems"></ul>
+            <button id="clearCartBtn">Очистить корзину</button>
+            <button id="checkoutBtn" class="checkout-btn">Оформить заказ</button> <!-- Вставляем кнопку "Оформить заказ" -->
+        </div>
+    </div>
+      <div id="successModal" class="modal"> <!-- Уникальный идентификатор -->
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <p>Товар добавлен в корзину!</p>
+        </div>
+      </div>
+      <div id="orderSuccessModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Заказ успешно оформлен!</p>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2024 Терасса. Все права защищены.</p>
+    </footer>
+
+    <script>document.addEventListener('DOMContentLoaded', function() {
+        const cartBtn = document.getElementById('cart');
+        const modal = document.getElementById('cartModal');
+        const closeBtn = modal.querySelector('.close');
+        const clearCartBtn = document.getElementById('clearCartBtn');
+        const cartItemsList = document.getElementById('cartItems');
+        const successModal = document.getElementById('successModal');
+        const orderSuccessModal = document.getElementById('orderSuccessModal'); // Новый модальный элемент
+        const checkoutBtn = document.getElementById('checkoutBtn'); // Кнопка "Оформить заказ"
+        const totalCostDisplay = document.createElement("p"); // Элемент для отображения суммы
+        modal.querySelector('.modal-content').appendChild(totalCostDisplay); // Добавляем его в модальное окно
+    
+        let totalCost = 0; // Переменная для хранения общей суммы
+    
+        cartBtn.addEventListener('click', function() {
+            modal.style.display = 'block';
+            updateTotalCostDisplay();
+        });
+    
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+    
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    
+        clearCartBtn.addEventListener('click', function() {
+            cartItemsList.innerHTML = '';
+            totalCost = 0; // Сбрасываем общую сумму
+            updateTotalCostDisplay();
+        });
+    
+        function addToCart(title, imageSrc, price) {
+            const cartItem = document.createElement("li");
+            const image = document.createElement("img");
+            image.src = imageSrc;
+            image.alt = title;
+            cartItem.appendChild(image);
+            const itemName = document.createElement("span");
+            itemName.textContent = title;
+            cartItem.appendChild(itemName);
+            const itemPrice = document.createElement("span");
+            itemPrice.textContent = price + " ₽"; // Добавляем символ рубля после цены
+            cartItem.dataset.price = price; // Добавляем цену в качестве атрибута data
+            cartItem.appendChild(itemPrice);
+            const removeBtn = document.createElement("button");
+            removeBtn.textContent = "Удалить";
+            removeBtn.classList.add("remove-from-cart-btn");
+            cartItem.appendChild(removeBtn);
+            cartItemsList.appendChild(cartItem);
+            successModal.style.display = 'block';
+            setTimeout(function() {
+                successModal.style.display = 'none';
+            }, 1000);
+            totalCost += price; // Обновляем общую сумму
+            updateTotalCostDisplay();
+        }
+    
+        cartItemsList.addEventListener("click", function(event) {
+            if (event.target.classList.contains("remove-from-cart-btn")) {
+                const itemToRemove = event.target.parentElement;
+                const price = parseInt(itemToRemove.dataset.price); // Получаем цену товара
+                itemToRemove.remove();
+                totalCost -= price; // Обновляем общую сумму
+                updateTotalCostDisplay();
+            }
+        });
+    
+        const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+        addToCartButtons.forEach(function(button) {
+            button.addEventListener("click", function(event) {
+                const title = button.parentElement.querySelector("h3").textContent;
+                const figure = button.closest('figure');
+                const image = figure.querySelector('img');
+                const imageSrc = image ? image.src : ''; // Проверяем, есть ли изображение
+                const price = parseInt(button.dataset.price); // Получаем цену товара
+                addToCart(title, imageSrc, price);
+            });
+        });
+    
+        checkoutBtn.addEventListener('click', function() {
+            orderSuccessModal.style.display = 'block'; // Показать модальное окно
+            setTimeout(function() {
+                orderSuccessModal.style.display = 'none'; // Скрыть через 2 секунды
+            }, 2000);
+            cartItemsList.innerHTML = ''; // Очистить корзину
+            totalCost = 0; // Сбросить общую сумму
+            updateTotalCostDisplay();
+        });
+    
+        // Функция для обновления отображения общей суммы
+        function updateTotalCostDisplay() {
+            totalCostDisplay.textContent = "Общая сумма: " + totalCost + " ₽";
+        }
+    });
+    
+        </script>
+</body>
+</html>

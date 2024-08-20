@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>О нас - Терасса</title>
+    
+</head>
+<style>
+   .about-section {
+    background-image: url('/images/backabout.jpg');
+  
+}
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.about-section {
+    background-image: url('/images/about-back.jpg');
+    padding: 80px 0; /* Отступы сверху и снизу */
+    text-align: center;
+}
+
+.about-container {
+    background-color: rgba(255, 255, 255, 0.7); /* Полупрозрачный белый цвет фона */
+    padding: 40px; /* Отступы внутри контейнера */
+    border: 2px solid #343a40; /* Толщина и цвет границы */
+    border-radius: 15px; /* Радиус скругления углов */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Тень контейнера */
+}
+
+.container {
+    max-width: 900px; /* Максимальная ширина контейнера */
+    margin: 0 auto; /* Выравнивание по центру */
+}
+
+.about-heading {
+    font-size: 36px;
+    color: #343a40; /* Цвет текста заголовка */
+    margin-bottom: 30px; /* Отступ снизу */
+}
+
+.about-content {
+    max-width: 800px; /* Максимальная ширина контента */
+    margin: 0 auto; /* Выравнивание по центру */
+}
+
+.about-paragraph {
+    font-size: 1.2em; /* Размер шрифта текста */
+    line-height: 1.6; /* Межстрочный интервал */
+    color: #6c757d; /* Цвет текста */
+    margin-bottom: 30px; /* Отступ снизу между параграфами */
+}
+
+.about-paragraph:last-child {
+    margin-bottom: 0; /* Убираем отступ у последнего параграфа */
+}
+
+</style>
+<body>
+    
+    <header>
+        <div class="logo">
+            <img src="/images/logo.svg" alt="Your Logo">
+        </div>
+        <div class="header-overlay"></div>  
+        
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li class="dropdown">
+                    <div class="navigation"></div>
+                    <a href="index.html#menu">Меню</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#appetizers">Закуски</a></li>
+                        <li><a href="#main-courses">Основные блюда</a></li>
+                        <li><a href="#desserts">Десерты</a></li>
+                    </ul>
+                </li>
+                <li class="active"><a href="about.html">О нас</a></li>
+                <li><a href="index.html#contact">Контакты</a></li>
+                <li><a href="/booking.html">Бронирование</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-container">
+                <h2 class="about-heading">О нас</h2>
+                <div class="about-content">
+                    <p class="about-paragraph">Ресторан "Терасса" предлагает вам уникальный опыт, объединяющий в себе изысканное меню, уютную атмосферу и профессиональное обслуживание. Наша команда шеф-поваров тщательно отбирает только лучшие ингредиенты, чтобы приготовить для вас блюда, которые порадуют ваш вкус.</p>
+                    <p class="about-paragraph">Мы стремимся создать идеальное место для встреч с друзьями, деловых обедов и романтических ужинов. В нашем ресторане вы найдете уютные зоны отдыха и просторные залы для проведения различных мероприятий.</p>
+                    <p class="about-paragraph">Наша команда с гордостью представляет вам множество кулинарных шедевров, каждый из которых приготовлен с любовью и профессионализмом. Мы уверены, что каждое посещение ресторана "Терасса" станет для вас незабываемым и приятным впечатлением.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <p>&copy; 2024 Терасса. Все права защищены.</p>
+    </footer>
+</body>
+</html>
